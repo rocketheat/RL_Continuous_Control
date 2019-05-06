@@ -94,6 +94,15 @@ Episode 54	Average Score: 30.07
 Environment solved in 53 episodes!	Average Score: 30.07  
 
 ![png](model.png)
-  
+
 ### Future next steps:
-Q-learning often over-estimates the value function especially early in the training. Double Q network and Dueling Q network can help overcome this. Double Q network works by having two different Q tables. At each timestep, we pick one of them to determine the maximizing action, and we use the other one to calculate the estimate. We would use both to select actions by using the average of both Q(s) estimates. While Dueling Q network works by branching the network and then combine the state and advantage values.
+While we are able to achieve the target goal, it took 53 episodes till convergence. Distributed Distributional Deep Deterministic Policy Gradient algorithm, D4PG, through N-step returns and prioritized experience replay might offer a faster algorithm to achieve convergence and would be our next future plan for this project. 
+
+### References:
+1. Mnih V, Puigdomènech Badia A, Mirza M, et al. Asynchronous Methods for Deep Reinforcement Learning.; 2016. https://arxiv.org/pdf/1602.01783.pdf. Accessed April 15, 2019.
+
+2. Barth-Maron G, Hoffman MW, Budden D, et al. Distributed Distributional Deterministic Policy Gradients. 2018:1-16. http://arxiv.org/abs/1804.08617.
+
+3. Rudy Gilman. Intuitive RL: Intro to Advantage-Actor-Critic (A2C). https://hackernoon.com/intuitive-rl-intro-to-advantage-actor-critic-a2c-4ff545978752. Accessed May 5, 2019.
+
+4. Arthur Juliani. Simple Reinforcement Learning with Tensorflow Part 8: Asynchronous Actor-Critic Agents (A3C). https://medium.com/emergent-future/simple-reinforcement-learning-with-tensorflow-part-8-asynchronous-actor-critic-agents-a3c-c88f72a5e9f2. Accessed May 5, 2019.
