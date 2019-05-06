@@ -50,7 +50,7 @@ TAU = 1e-3              # for soft update of target parameters
 LR_ACTOR = 1e-4         # learning rate of the actor
 LR_CRITIC = 1e-4        # learning rate of the critic
 WEIGHT_DECAY = 0        # L2 weight decay
-N_EPISODES = 1000
+N_EPISODES = 4
 
 # All four networks structure: two hidden layers with size (256, 128)
 fc1_units=256
@@ -92,8 +92,8 @@ def ddpg_train(n_episodes=N_EPISODES, train=True):
 
             states = next_states                                     # roll over the state to next time step
 
-            sleep(0.03) # Time in seconds.
-            
+            sleep(0.003) # Time in seconds.
+
             if np.any( dones ):                                      # exit loop if episode finished
                 break
 
