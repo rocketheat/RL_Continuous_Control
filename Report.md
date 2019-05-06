@@ -93,10 +93,12 @@ Episode 54	Average Score: 30.07
 
 Environment solved in 53 episodes!	Average Score: 30.07  
 
-![png](model.png)
+![png](model.png)  
+
+![Agent](./model_test.gif)  
 
 ### Future next steps:
-While we are able to achieve the target goal, it took 53 episodes till convergence. Distributed Distributional Deep Deterministic Policy Gradient algorithm, D4PG, through N-step returns and prioritized experience replay might offer a faster algorithm to achieve convergence and would be our next future plan for this project. 
+While we are able to achieve the target goal, it took 53 episodes till convergence. Distributed Distributional Deep Deterministic Policy Gradient algorithm, D4PG, through N-step returns and prioritized experience replay might offer a faster algorithm to achieve convergence and would be our next future plan for this project.
 
 ### References:
 1. Mnih V, Puigdomènech Badia A, Mirza M, et al. Asynchronous Methods for Deep Reinforcement Learning.; 2016. https://arxiv.org/pdf/1602.01783.pdf. Accessed April 15, 2019.

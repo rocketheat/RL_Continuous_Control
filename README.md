@@ -5,8 +5,8 @@ This repository describe the solution for the continuous control project in the 
 
 ## Environment Description:
 
-
-
+![Agent](./model_test.gif)  
+  
 There are 33 variables corresponding to position, rotation, velocity, and angular velocities of the arm:
 We used Reacher_2 which has 20 agents to solve the environment.
 
