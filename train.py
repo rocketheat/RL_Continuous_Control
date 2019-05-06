@@ -15,7 +15,8 @@ class Agent():
         device,
         state_size, n_agents, action_size, random_seed,
         buffer_size, batch_size, gamma, TAU, lr_actor, lr_critic, weight_decay,
-        checkpoint_folder = './'):
+        fc1_units, fc2_units,
+        checkpoint_folder = './Saved_Model/'):
 
         self.DEVICE = device
 
@@ -35,21 +36,24 @@ class Agent():
 
         self.CHECKPOINT_FOLDER = checkpoint_folder
 
-        # Actor Network (w/ Target Network)
-        self.actor_local = Actor(state_size, action_size, random_seed).to(self.DEVICE)
-        self.actor_target = Actor(state_size, action_size, random_seed).to(self.DEVICE)
-        self.actor_optimizer = optim.Adam(self.actor_local.parameters(), lr=self.LR_ACTOR)
+        # Actor Networks:
+        # Creating two actor networks a the base and target network
+        self.actor = Actor(state_size, action_size, random_seed, fc1_units=fc1_units, fc2_units=fc2_units).to(self.DEVICE)
+        self.actor_target = Actor(state_size, action_size, random_seed, fc1_units=fc1_units, fc2_units=fc2_units).to(self.DEVICE)
+        self.actor_optimizer = optim.Adam(self.actor.parameters(), lr=self.LR_ACTOR)
 
-        # Critic Network (w/ Target Network)
-        self.critic_local = Critic(state_size, action_size, random_seed).to(self.DEVICE)
-        self.critic_target = Critic(state_size, action_size, random_seed).to(self.DEVICE)
-        self.critic_optimizer = optim.Adam(self.critic_local.parameters(), lr=self.LR_CRITIC, weight_decay=self.WEIGHT_DECAY)
+        # Critic Networks:
+        # Creating two critic networks a the base and target network
+        self.critic = Critic(state_size, action_size, random_seed, fc1_units=fc1_units, fc2_units=fc2_units).to(self.DEVICE)
+        self.critic_target = Critic(state_size, action_size, random_seed, fc1_units=fc1_units, fc2_units=fc2_units).to(self.DEVICE)
+        self.critic_optimizer = optim.Adam(self.critic.parameters(), lr=self.LR_CRITIC, weight_decay=self.WEIGHT_DECAY)
 
+        # Load saved weights if existed
         if os.path.isfile(self.CHECKPOINT_FOLDER + 'checkpoint_actor.pth') and os.path.isfile(self.CHECKPOINT_FOLDER + 'checkpoint_critic.pth'):
-            self.actor_local.load_state_dict(torch.load(self.CHECKPOINT_FOLDER + 'checkpoint_actor.pth'))
+            self.actor.load_state_dict(torch.load(self.CHECKPOINT_FOLDER + 'checkpoint_actor.pth'))
             self.actor_target.load_state_dict(torch.load(self.CHECKPOINT_FOLDER + 'checkpoint_actor.pth'))
 
-            self.critic_local.load_state_dict(torch.load(self.CHECKPOINT_FOLDER + 'checkpoint_critic.pth'))
+            self.critic.load_state_dict(torch.load(self.CHECKPOINT_FOLDER + 'checkpoint_critic.pth'))
             self.critic_target.load_state_dict(torch.load(self.CHECKPOINT_FOLDER + 'checkpoint_critic.pth'))
 
         # Noise process
@@ -72,10 +76,10 @@ class Agent():
     def act(self, state, add_noise=True):
         """Returns actions for given state as per current policy."""
         state = torch.from_numpy(state).float().to(self.DEVICE)
-        self.actor_local.eval()
+        self.actor.eval()
         with torch.no_grad():
-            action = self.actor_local(state).cpu().data.numpy()
-        self.actor_local.train()
+            action = self.actor(state).cpu().data.numpy()
+        self.actor.train()
         if add_noise:
             action += self.noise.sample()
         return np.clip(action, -1, 1)
@@ -103,26 +107,26 @@ class Agent():
         # Compute Q targets for current states (y_i)
         Q_targets = rewards + (self.GAMMA * Q_targets_next * (1 - dones))
         # Compute critic loss
-        Q_expected = self.critic_local(states, actions)
+        Q_expected = self.critic(states, actions)
         critic_loss = F.mse_loss(Q_expected, Q_targets)
         # Minimize the loss
         self.critic_optimizer.zero_grad()
         critic_loss.backward()
-        # torch.nn.utils.clip_grad_norm(self.critic_local.parameters(), 1)
+        # torch.nn.utils.clip_grad_norm(self.critic.parameters(), 1)
         self.critic_optimizer.step()
 
         # ---------------------------- update actor ---------------------------- #
         # Compute actor loss
-        actions_pred = self.actor_local(states)
-        actor_loss = -self.critic_local(states, actions_pred).mean()
+        actions_pred = self.actor(states)
+        actor_loss = -self.critic(states, actions_pred).mean()
         # Minimize the loss
         self.actor_optimizer.zero_grad()
         actor_loss.backward()
         self.actor_optimizer.step()
 
         # ----------------------- update target networks ----------------------- #
-        self.soft_update(self.critic_local, self.critic_target)
-        self.soft_update(self.actor_local, self.actor_target)
+        self.soft_update(self.critic, self.critic_target)
+        self.soft_update(self.actor, self.actor_target)
 
     def soft_update(self, local_model, target_model):
         """Soft update model parameters.
@@ -138,8 +142,8 @@ class Agent():
             target_param.data.copy_(tau*local_param.data + (1.0-tau)*target_param.data)
 
     def checkpoint(self):
-        torch.save(self.actor_local.state_dict(), self.CHECKPOINT_FOLDER + 'checkpoint_actor.pth')
-        torch.save(self.critic_local.state_dict(), self.CHECKPOINT_FOLDER + 'checkpoint_critic.pth')
+        torch.save(self.actor.state_dict(), self.CHECKPOINT_FOLDER + 'checkpoint_actor.pth')
+        torch.save(self.critic.state_dict(), self.CHECKPOINT_FOLDER + 'checkpoint_critic.pth')
 
 class OUNoise:
     """Ornstein-Uhlenbeck process."""
